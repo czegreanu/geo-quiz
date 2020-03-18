@@ -7,12 +7,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class QuizActivity : AppCompatActivity() {
+    private lateinit var trueButton: Button
+    private lateinit var falseButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        val mTrueButton = findViewById<Button>(R.id.true_button)
-        mTrueButton?.setOnClickListener {
+        trueButton = findViewById(R.id.true_button)
+        trueButton.setOnClickListener {
             Toast.makeText(
                 this@QuizActivity,
                 R.string.correct_toast,
@@ -23,8 +26,8 @@ class QuizActivity : AppCompatActivity() {
             }
         }
 
-        val mFalseButton = findViewById<Button>(R.id.false_button)
-        mFalseButton?.setOnClickListener {
+        falseButton = findViewById(R.id.false_button)
+        falseButton.setOnClickListener {
             Toast.makeText(
                 this@QuizActivity,
                 R.string.incorrect_toast,
