@@ -1,6 +1,7 @@
 package zegreanu.cristi.geoquiz
 
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +17,10 @@ class QuizActivity : AppCompatActivity() {
                 this@QuizActivity,
                 R.string.correct_toast,
                 Toast.LENGTH_SHORT
-            ).show()
+            ).run {
+                setGravity(Gravity.TOP, 0, 0)
+                show()
+            }
         }
 
         val mFalseButton = findViewById<Button>(R.id.false_button)
@@ -25,7 +29,10 @@ class QuizActivity : AppCompatActivity() {
                 this@QuizActivity,
                 R.string.incorrect_toast,
                 Toast.LENGTH_SHORT
-            ).show()
+            ).run {
+                setGravity(Gravity.TOP, 0, 0)
+                show()
+            }
         }
     }
 }
