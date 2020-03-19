@@ -1,8 +1,8 @@
 package zegreanu.cristi.geoquiz
 
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 class QuizActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
-    private lateinit var nextButton: Button
+    private lateinit var nextButton: ImageButton
+    private lateinit var previousButton: ImageButton
     private lateinit var questionTextView: TextView
 
     private var questionBank = arrayOf(
@@ -28,6 +29,10 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         questionTextView = findViewById(R.id.question_text_view)
+        questionTextView.setOnClickListener {
+            currentIndex = (currentIndex + 1) % questionBank.size
+            updateQuestion()
+        }
         updateQuestion()
 
         trueButton = findViewById(R.id.true_button)
@@ -43,6 +48,14 @@ class QuizActivity : AppCompatActivity() {
         nextButton = findViewById(R.id.next_button)
         nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
+            updateQuestion()
+        }
+
+        previousButton = findViewById(R.id.previous_button)
+        previousButton.setOnClickListener {
+            currentIndex = (currentIndex - 1) % questionBank.size
+            if (currentIndex < 0)
+                currentIndex += questionBank.size
             updateQuestion()
         }
     }
