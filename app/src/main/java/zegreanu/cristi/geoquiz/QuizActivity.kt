@@ -1,13 +1,16 @@
 package zegreanu.cristi.geoquiz
 
 import android.os.Bundle
-import android.view.Gravity
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class QuizActivity : AppCompatActivity() {
+    private val TAG = "QuizActivity"
+    private val KEY_INDEX = "index"
+
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var nextButton: Button
@@ -24,8 +27,12 @@ class QuizActivity : AppCompatActivity() {
     private var currentIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate(Bundle) called")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
+
+        if (savedInstanceState != null)
+            currentIndex = savedInstanceState.getInt(KEY_INDEX, 0)
 
         questionTextView = findViewById(R.id.question_text_view)
         updateQuestion()
@@ -46,6 +53,39 @@ class QuizActivity : AppCompatActivity() {
             updateQuestion()
         }
     }
+
+    // region Activity lifecycle
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume() called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() called")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.i(TAG, "onSaveInstanceState")
+        outState.putInt(KEY_INDEX, currentIndex)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy() called")
+    }
+    // endregion
 
     private fun updateQuestion() {
         val question = questionBank[currentIndex].textResId
