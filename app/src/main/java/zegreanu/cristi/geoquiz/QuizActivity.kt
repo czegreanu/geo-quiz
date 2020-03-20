@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 class QuizActivity : AppCompatActivity() {
     private val TAG = "QuizActivity"
     private val KEY_INDEX = "index"
+    private val KEY_QUESTIONS = "questions"
     private val REQUEST_CODE_CHEAT = 0
 
     private lateinit var trueButton: Button
@@ -29,7 +30,6 @@ class QuizActivity : AppCompatActivity() {
         Question(R.string.question_asia, true)
     )
 
-    private var isCheater: Boolean = false
     private var currentIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +37,10 @@ class QuizActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        savedInstanceState?.let { currentIndex = it.getInt(KEY_INDEX, 0) }
+        savedInstanceState?.let {
+            currentIndex = it.getInt(KEY_INDEX, 0)
+            questionBank = it.getParcelableArray(KEY_QUESTIONS) as Array<Question>
+        }
 
         questionTextView = findViewById(R.id.question_text_view)
         updateQuestion()
@@ -63,7 +66,6 @@ class QuizActivity : AppCompatActivity() {
         nextButton = findViewById(R.id.next_button)
         nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
-            isCheater = false
             updateQuestion()
         }
     }
@@ -74,8 +76,10 @@ class QuizActivity : AppCompatActivity() {
         if (resultCode != Activity.RESULT_OK)
             return
         if (requestCode == REQUEST_CODE_CHEAT) {
-            if (data != null)
-                isCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false)
+            if (data != null) {
+                questionBank[currentIndex].isCheated =
+                    data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false)
+            }
         }
     }
 
@@ -98,7 +102,10 @@ class QuizActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         Log.i(TAG, "onSaveInstanceState")
-        outState.putInt(KEY_INDEX, currentIndex)
+        outState.apply {
+            putInt(KEY_INDEX, currentIndex)
+            putParcelableArray(KEY_QUESTIONS, questionBank)
+        }
     }
 
     override fun onStop() {
@@ -122,7 +129,7 @@ class QuizActivity : AppCompatActivity() {
         val answerIsTrue = questionBank[currentIndex].answerTrue
         val messageResId =
             when {
-                isCheater -> R.string.judgment_toast
+                questionBank[currentIndex].isCheated -> R.string.judgment_toast
                 userPressedTrue == answerIsTrue -> R.string.correct_toast
                 else -> R.string.incorrect_toast
             }

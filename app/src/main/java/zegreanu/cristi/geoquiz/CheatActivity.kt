@@ -8,16 +8,23 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class CheatActivity : AppCompatActivity() {
+    private val KEY_ANSWER_SHOWN = "answer_shown"
+
     private lateinit var showAnswerButton: Button
     private lateinit var answerTextView: TextView
 
+    private var isAnswerShown: Boolean = false
     private var answerIsTrue: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cheat)
 
-        answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
+        answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, answerIsTrue)
+        savedInstanceState?.let {
+            isAnswerShown = it.getBoolean(KEY_ANSWER_SHOWN, isAnswerShown)
+            setAnswerShownResult()
+        }
 
         answerTextView = findViewById(R.id.answer_text_view)
 
@@ -27,11 +34,18 @@ class CheatActivity : AppCompatActivity() {
                 answerTextView.setText(R.string.true_button)
             else
                 answerTextView.setText(R.string.false_button)
-            setAnswerShownResult(true)
+            isAnswerShown = true
+            setAnswerShownResult()
         }
     }
 
-    private fun setAnswerShownResult(isAnswerShown: Boolean) {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean(KEY_ANSWER_SHOWN, isAnswerShown)
+    }
+
+    private fun setAnswerShownResult() {
         setResult(RESULT_OK, Intent().putExtra(EXTRA_ANSWER_SHOWN, isAnswerShown))
     }
 
