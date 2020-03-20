@@ -1,3 +1,10 @@
 package zegreanu.cristi.geoquiz
 
-data class Question(val textResId: Int, val answerTrue: Boolean)
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class Question(
+    val textResId: Int,
+    val answerTrue: Boolean, var isCheated: Boolean = false
+) : Parcelable
