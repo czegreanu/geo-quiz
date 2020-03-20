@@ -1,5 +1,7 @@
 package zegreanu.cristi.geoquiz
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -10,9 +12,11 @@ import androidx.appcompat.app.AppCompatActivity
 class QuizActivity : AppCompatActivity() {
     private val TAG = "QuizActivity"
     private val KEY_INDEX = "index"
+    private val REQUEST_CODE_CHEAT = 0
 
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
+    private lateinit var cheatButton: Button
     private lateinit var nextButton: Button
     private lateinit var questionTextView: TextView
 
@@ -24,6 +28,8 @@ class QuizActivity : AppCompatActivity() {
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true)
     )
+
+    private var isCheater: Boolean = false
     private var currentIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +37,7 @@ class QuizActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        if (savedInstanceState != null)
-            currentIndex = savedInstanceState.getInt(KEY_INDEX, 0)
+        savedInstanceState?.let { currentIndex = it.getInt(KEY_INDEX, 0) }
 
         questionTextView = findViewById(R.id.question_text_view)
         updateQuestion()
@@ -47,10 +52,30 @@ class QuizActivity : AppCompatActivity() {
             checkAnswer(false)
         }
 
+        cheatButton = findViewById(R.id.cheat_button)
+        cheatButton.setOnClickListener {
+            startActivityForResult(
+                CheatActivity.newIntent(this, questionBank[currentIndex].answerTrue),
+                REQUEST_CODE_CHEAT
+            )
+        }
+
         nextButton = findViewById(R.id.next_button)
         nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
+            isCheater = false
             updateQuestion()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK)
+            return
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data != null)
+                isCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false)
         }
     }
 
@@ -87,6 +112,7 @@ class QuizActivity : AppCompatActivity() {
     }
     // endregion
 
+    //region Private helpers
     private fun updateQuestion() {
         val question = questionBank[currentIndex].textResId
         questionTextView.setText(question)
@@ -95,7 +121,11 @@ class QuizActivity : AppCompatActivity() {
     private fun checkAnswer(userPressedTrue: Boolean) {
         val answerIsTrue = questionBank[currentIndex].answerTrue
         val messageResId =
-            if (userPressedTrue == answerIsTrue) R.string.correct_toast else R.string.incorrect_toast
+            when {
+                isCheater -> R.string.judgment_toast
+                userPressedTrue == answerIsTrue -> R.string.correct_toast
+                else -> R.string.incorrect_toast
+            }
 
         Toast.makeText(
             this@QuizActivity,
@@ -103,4 +133,5 @@ class QuizActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         ).show()
     }
+    // endregion
 }
