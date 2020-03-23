@@ -14,6 +14,7 @@ import androidx.core.animation.doOnEnd
 class CheatActivity : AppCompatActivity() {
     private lateinit var showAnswerButton: Button
     private lateinit var answerTextView: TextView
+    private lateinit var apiLevelTextView: TextView
 
     private var answerIsTrue: Boolean = false
 
@@ -35,6 +36,9 @@ class CheatActivity : AppCompatActivity() {
             setAnswerShownResult(true)
             showAnimation()
         }
+
+        apiLevelTextView = findViewById(R.id.api_level_text_view)
+        apiLevelTextView.text = "API Level ${Build.VERSION.SDK_INT}"
     }
 
     private fun showAnimation() {
