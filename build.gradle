@@ -16,6 +16,10 @@ buildscript {
     }
 }
 
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("1.7.0")
+}
+
 allprojects {
     repositories {
         google()
@@ -27,3 +31,18 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+detekt {
+    failFast = true
+    buildUponDefaultConfig = true
+    config = files("$projectDir/config/detekt.yml")
+    baseline = file("$projectDir/config/baseline.xml")
+
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        txt.enabled = true
+    }
+}
+
+tasks.detekt.jvmTarget = "1.8"
