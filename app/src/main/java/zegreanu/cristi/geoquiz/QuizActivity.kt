@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.properties.Delegates
 
 class QuizActivity : AppCompatActivity() {
     private val TAG = "QuizActivity"
@@ -19,6 +21,7 @@ class QuizActivity : AppCompatActivity() {
     private lateinit var cheatButton: Button
     private lateinit var nextButton: Button
     private lateinit var questionTextView: TextView
+    private lateinit var availableCheatTextView: TextView
 
     private var questionBank = arrayOf(
         Question(R.string.question_australia, true),
@@ -29,15 +32,27 @@ class QuizActivity : AppCompatActivity() {
         Question(R.string.question_asia, true)
     )
 
-    private var isCheater: Boolean = false
     private var currentIndex: Int = 0
+    private var availableCheats: Int by Delegates.observable(3) { _, _, new ->
+        updateAvailableCheatText()
+        if (new == 0)
+            cheatButton.visibility = View.GONE
+    }
+
+    private var isCheater: Boolean by Delegates.observable(false) { _, _, new ->
+        if (new && availableCheats > 0)
+            availableCheats--
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate(Bundle) called")
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_quiz)
 
+        setContentView(R.layout.activity_quiz)
         savedInstanceState?.let { currentIndex = it.getInt(KEY_INDEX, 0) }
+
+        availableCheatTextView = findViewById(R.id.available_cheats_text_view)
+        updateAvailableCheatText()
 
         questionTextView = findViewById(R.id.question_text_view)
         updateQuestion()
@@ -132,6 +147,11 @@ class QuizActivity : AppCompatActivity() {
             messageResId,
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    private fun updateAvailableCheatText() {
+        availableCheatTextView.text =
+            String.format(getString(R.string.available_cheats), availableCheats)
     }
     // endregion
 }
